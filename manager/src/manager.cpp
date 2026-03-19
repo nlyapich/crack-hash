@@ -342,6 +342,10 @@ void Manager::handleWorkerResponse(const httplib::Request& req, httplib::Respons
                                  workerResp.results.begin(), 
                                  workerResp.results.end());
             state->workersCompleted++;
+            if (state->status == models::RequestStatus::IN_PROGRESS)
+            {
+                state->status = models::RequestStatus::PARTIALLY_READY;
+            }
             
             if (state->workersCompleted >= state->totalWorkers) {
                 state->status = CrackHash::models::RequestStatus::READY;

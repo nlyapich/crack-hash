@@ -29,6 +29,7 @@ struct CrackResponse
 enum class RequestStatus
 {
     IN_PROGRESS,
+    PARTIALLY_READY,
     READY,
     ERROR
 };
