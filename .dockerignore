@@ -1,0 +1,28 @@
+# Игнорировать папку сборки
+build/
+*/build/
+
+# Игнорировать кэш CMake
+CMakeCache.txt
+*/CMakeCache.txt
+CMakeFiles/
+*/CMakeFiles/
+
+# Игнорировать артефакты Conan
+*/generators/
+conanfile.txt.lock
+
+# Игнорировать системные файлы
+.git/
+.gitignore
+*.md
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Игнорировать бинарники
+*.o
+*.a
+*.so
+*.exe

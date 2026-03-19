@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  manager:
+    build:
+      context: .
+      dockerfile: manager/Dockerfile
+      args:
+        - MANAGER_PORT=${MANAGER_PORT}
+    ports:
+      - "${MANAGER_PORT}:8080"
+    environment:
+      - WORKER_URLS=${WORKER_URLS}
+      - MANAGER_PORT=${MANAGER_PORT}
+      - MANAGER_TIMEOUT_SECONDS=${MANAGER_TIMEOUT_SECONDS}
+      - ALPHABET=${ALPHABET}
+    networks:
+      - cracknet
+    depends_on:
+      - worker1
+      - worker2
+      - worker3
+    volumes:
+      - conan_cache:/root/.conan
+
+  worker1:
+    build:
+      context: .
+      dockerfile: worker/Dockerfile
+      args:
+        - WORKER_PORT=${WORKER_PORT}
+    environment:
+      - MANAGER_URL=http://manager:${MANAGER_PORT}
+      - WORKER_PORT=${WORKER_PORT}
+    networks:
+      - cracknet
+    volumes:
+      - conan_cache:/root/.conan
+
+  worker2:
+    extends: worker1
+
+  worker3:
+    extends: worker1
+
+networks:
+  cracknet:
+    driver: bridge
+
+volumes:
+  conan_cache:
