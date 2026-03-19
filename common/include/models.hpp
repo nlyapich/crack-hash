@@ -121,6 +121,7 @@ inline void to_json(nlohmann::json& j, const StatusResponse& resp)
     {
         case RequestStatus::IN_PROGRESS: statusStr = "IN_PROGRESS"; break;
         case RequestStatus::READY: statusStr = "READY"; break;
+        case RequestStatus::PARTIALLY_READY: statusStr = "PARTIALLY_READY"; break;
         case RequestStatus::ERROR: statusStr = "ERROR"; break;
     }
     j = nlohmann::json{{"status", statusStr}, {"data", resp.data}};
