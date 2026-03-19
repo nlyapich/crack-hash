@@ -24,7 +24,8 @@ Manager::Manager(const std::vector<std::string>& workerUrls,
                  int managerPort,
                  const std::string& alphabet,
                  int timeoutSeconds)
-: workerUrls{workerUrls},
+: healthyWorkers{static_cast<int>(workerUrls.size())},
+  workerUrls{workerUrls},
   kManagerPort{managerPort},
   kAlphabet{alphabet},
   kTimeoutSeconds{timeoutSeconds} {}
@@ -105,12 +106,19 @@ void Manager::startHealthCheck()
         {
             std::this_thread::sleep_for(std::chrono::seconds(5));
             
+            int tmpHealthyWorkers = 0;
+
             for (const auto& url : workerUrls)
             {
                 bool healthy = checkWorkerHealth(url);
                 healthCheck.insert(url, healthy);
+                if (healthy)
+                {
+                    tmpHealthyWorkers++;
+                }
                 spdlog::info("Worker {} health: {}", url, healthy ? "OK" : "FAILED");
             }
+            healthyWorkers = tmpHealthyWorkers;
         }
     }).detach();
 }
@@ -223,7 +231,7 @@ void Manager::handleCrackRequest(const httplib::Request& req, httplib::Response&
         std::string requestId = generateUUID();
         auto state = std::make_shared<RequestState>();
         state->createdAt = std::chrono::steady_clock::now();
-        state->totalWorkers = static_cast<int>(workerUrls.size());
+        state->totalWorkers = healthyWorkers;
         
         cacheRequests.insert({crackReq.hash, crackReq.maxLength}, requestId);
         requestStates.insert(requestId, state);
@@ -232,13 +240,13 @@ void Manager::handleCrackRequest(const httplib::Request& req, httplib::Response&
         long long totalCount = common::Combinatorics::getTotalCount(kAlphabet, crackReq.maxLength);
         long long chunkSize = totalCount / state->totalWorkers;
         
-        for (size_t i = 0; i < workerUrls.size(); ++i)
+        for (size_t i = 0; i < healthyWorkers; ++i)
         {
             CrackHash::xml_models::ManagerRequest task;
             task.requestId = requestId;
             task.hash = crackReq.hash;
             task.partNumber = static_cast<int>(i);
-            task.partCount = static_cast<int>(workerUrls.size());
+            task.partCount = healthyWorkers;
             task.maxLength = crackReq.maxLength;
     
             // Генерация алфавита из строки

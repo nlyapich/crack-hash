@@ -1,6 +1,7 @@
 #ifndef MANAGER_HPP
 #define MANAGER_HPP
 
+#include <atomic>
 #include <chrono>
 #include <mutex>
 #include <vector>
@@ -67,6 +68,7 @@ private:
 
     std::queue<CrackHash::xml_models::ManagerRequest> tasks;
 
+    std::atomic<int> healthyWorkers;
     std::vector<std::string> workerUrls;
     const std::string kAlphabet;
     const int kTimeoutSeconds;
