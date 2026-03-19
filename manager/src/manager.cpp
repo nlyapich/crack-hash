@@ -342,7 +342,7 @@ void Manager::handleWorkerResponse(const httplib::Request& req, httplib::Respons
                                  workerResp.results.begin(), 
                                  workerResp.results.end());
             state->workersCompleted++;
-            if (state->status == models::RequestStatus::IN_PROGRESS)
+            if (state->status == models::RequestStatus::IN_PROGRESS && !workerResp.results.empty())
             {
                 state->status = models::RequestStatus::PARTIALLY_READY;
             }

@@ -69,6 +69,9 @@ curl http://localhost:8081/api/hash/status?requestId=<requestId>
 // В процессе
 {"status": "IN_PROGRESS", "data": []}
 
+// Частично готово
+{"status": "PARTIALLY_READY", "data": ["abc"]}
+
 // Готово
 {"status": "READY", "data": ["abc", "def"]}
 
