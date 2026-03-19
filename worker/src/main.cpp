@@ -3,14 +3,11 @@
 
 int main()
 {
-    // const int         kWorkerPort = Env::get("WORKER_PORT", 8081);
-    // const std::string kManagerUrl = Env::get(
-    //     "MANAGER_URL", 
-    //     std::string("http://manager:8080")
-    // );
-
-    const int         kWorkerPort = Env::getRequired<int>("WORKER_PORT");
-    const std::string kManagerUrl = Env::getRequired<std::string>("MANAGER_URL");
+    const int         kWorkerPort = Env::get("WORKER_PORT", 8081);
+    const std::string kManagerUrl = Env::get(
+        "MANAGER_URL", 
+        std::string("http://manager:8080")
+    );
 
     CrackHash::Worker worker(kWorkerPort, kManagerUrl);
     
