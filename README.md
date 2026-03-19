@@ -124,6 +124,7 @@ curl http://localhost:8081/api/hash/status?requestId=<requestId>
 Возможные значения `status`:
 - `IN_PROGRESS` — задача выполняется
 - `READY` — задача завершена, результаты готовы
+- `PARTIALLY_READY` — задача частично готова
 - `ERROR` — произошла ошибка или истёк таймаут (300 сек)
 
 ## Как это работает
