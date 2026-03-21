@@ -100,7 +100,7 @@ void Worker::bruteForce(const CrackHash::xml_models::ManagerRequest& task)
         }
     }
     
-    long long totalCount = CrackHash::common::Combinatorics::getTotalCount(alphabet, task.maxLength);
+    long long totalCount = CrackHash::Combinatorics::getTotalCount(alphabet, task.maxLength);
     long long chunkSize = totalCount / task.partCount;
     
     long long startIndex = task.partNumber * chunkSize;
@@ -113,8 +113,8 @@ void Worker::bruteForce(const CrackHash::xml_models::ManagerRequest& task)
     
     for (long long i = startIndex; i < endIndex; ++i)
     {
-        std::string word = CrackHash::common::Combinatorics::getByIndex(alphabet, task.maxLength, i);
-        std::string hash = CrackHash::common::Hash::md5(word);
+        std::string word = CrackHash::Combinatorics::getByIndex(alphabet, task.maxLength, i);
+        std::string hash = CrackHash::Hash::md5(word);
         
         if (hash == task.hash)
         {

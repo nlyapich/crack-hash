@@ -10,9 +10,6 @@
 namespace CrackHash
 {
 
-namespace common
-{
-
 template<typename K, typename V>
 class ThreadSafeMap
 {
@@ -52,8 +49,6 @@ public:
         return map_.find(key) != map_.end();
     }
 };
-
-} // namespace common
 
 } // namespace CrackHash
 

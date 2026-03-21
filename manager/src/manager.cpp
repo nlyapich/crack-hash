@@ -237,7 +237,7 @@ void Manager::handleCrackRequest(const httplib::Request& req, httplib::Response&
         requestStates.insert(requestId, state);
         
         // Распределение задач между воркерами
-        long long totalCount = common::Combinatorics::getTotalCount(kAlphabet, crackReq.maxLength);
+        long long totalCount = Combinatorics::getTotalCount(kAlphabet, crackReq.maxLength);
         long long chunkSize = totalCount / state->totalWorkers;
         
         for (size_t i = 0; i < healthyWorkers; ++i)

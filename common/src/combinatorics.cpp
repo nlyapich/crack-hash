@@ -3,9 +3,6 @@
 namespace CrackHash
 {
 
-namespace common
-{
-
 // Подсчет общего количества комбинаций для длины от 1 до maxLength
 long long Combinatorics::getTotalCount(const std::string& alphabet, int maxLength)
 {
@@ -55,7 +52,5 @@ std::string Combinatorics::getByIndex(const std::string& alphabet,
     
     return result;
 }
-
-} // namespace common
 
 } // namespace CrackHash

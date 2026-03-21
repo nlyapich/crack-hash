@@ -61,10 +61,10 @@ private:
 
     void startQueue();
 
-    common::ThreadSafeMap<std::string, std::shared_ptr<RequestState>> requestStates;
-    common::ThreadSafeMap<std::pair<std::string, int>, std::string> cacheRequests;
-    common::ThreadSafeMap<std::string, bool> healthCheck;
-    common::ThreadSafeMap<std::string, bool> busyWorkers;
+    ThreadSafeMap<std::string, std::shared_ptr<RequestState>> requestStates;
+    ThreadSafeMap<std::pair<std::string, int>, std::string> cacheRequests;
+    ThreadSafeMap<std::string, bool> healthCheck;
+    ThreadSafeMap<std::string, bool> busyWorkers;
 
     std::queue<CrackHash::xml_models::ManagerRequest> tasks;
 

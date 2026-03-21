@@ -9,9 +9,6 @@
 namespace CrackHash
 {
 
-namespace common
-{
-
 class Combinatorics
 {
 public:
@@ -23,8 +20,6 @@ public:
                                   int maxLength,
                                   long long globalIndex);
 };
-
-} // namespace common
 
 } // namespace CrackHash
 
