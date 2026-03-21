@@ -1,4 +1,4 @@
-#include "hasher.hpp"
+#include "hash.hpp"
 
 #include <openssl/md5.h>
 #include <string>
@@ -11,7 +11,10 @@ namespace CrackHash
 namespace common
 {
 
-std::string Hasher::md5(const std::string& input)
+namespace Hash
+{
+
+std::string md5(const std::string& input)
 {
     unsigned char digest[MD5_DIGEST_LENGTH];
     MD5(reinterpret_cast<const unsigned char*>(input.c_str()), input.size(), digest);
@@ -23,6 +26,8 @@ std::string Hasher::md5(const std::string& input)
     }
     return ss.str();
 }
+
+} // namespace Hash
 
 } // namespace common
 

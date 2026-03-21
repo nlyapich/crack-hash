@@ -10,7 +10,7 @@
 #include <uuid/uuid.h>
 
 #include "models.hpp"
-#include "hasher.hpp"
+#include "hash.hpp"
 #include "combinatorics.hpp"
 #include "thread_safe_map.hpp"
 #include "xml_models.hpp"

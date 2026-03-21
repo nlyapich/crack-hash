@@ -5,7 +5,7 @@
 #include <httplib.h>
 
 #include "models.hpp"
-#include "hasher.hpp"
+#include "hash.hpp"
 #include "combinatorics.hpp"
 #include "xml_models.hpp" 
 
@@ -114,7 +114,7 @@ void Worker::bruteForce(const CrackHash::xml_models::ManagerRequest& task)
     for (long long i = startIndex; i < endIndex; ++i)
     {
         std::string word = CrackHash::common::Combinatorics::getByIndex(alphabet, task.maxLength, i);
-        std::string hash = CrackHash::common::Hasher::md5(word);
+        std::string hash = CrackHash::common::Hash::md5(word);
         
         if (hash == task.hash)
         {
