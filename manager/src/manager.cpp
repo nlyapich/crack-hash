@@ -24,7 +24,7 @@ Manager::Manager(const std::vector<std::string>& workerUrls,
                  const std::string& alphabet,
                  int timeoutSeconds)
 : healthyWorkers{static_cast<int>(workerUrls.size())},
-  workerUrls{workerUrls},
+  kWorkerUrls{workerUrls},
   kManagerPort{managerPort},
   kAlphabet{alphabet},
   kTimeoutSeconds{timeoutSeconds} {}
@@ -33,8 +33,8 @@ Manager::~Manager() {}
 
 void Manager::start()
 {
-    spdlog::info("Manager found {} worker(s)\n", workerUrls.size());
-    for (const auto& url : workerUrls)
+    spdlog::info("Manager found {} worker(s)\n", kWorkerUrls.size());
+    for (const auto& url : kWorkerUrls)
     {
         spdlog::info("   - {}\n", url);
     }
@@ -107,7 +107,7 @@ void Manager::startHealthCheck()
             
             int tmpHealthyWorkers = 0;
 
-            for (const auto& url : workerUrls)
+            for (const auto& url : kWorkerUrls)
             {
                 bool healthy = checkWorkerHealth(url);
                 healthCheck.insert(url, healthy);
@@ -132,7 +132,7 @@ void Manager::startQueue()
             
             if (!tasks.empty())
             {
-                for (const auto& url : workerUrls)
+                for (const auto& url : kWorkerUrls)
                 {
                     bool healthy = *healthCheck.get(url);
                     if (!healthy)
@@ -255,7 +255,6 @@ void Manager::handleCrackRequest(const httplib::Request& req, httplib::Response&
             }
             
             tasks.push(task);
-            // sendTaskToWorker(workerUrls[i], task);
         }
         
         // Ответ клиенту

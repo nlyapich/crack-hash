@@ -68,7 +68,7 @@ private:
     std::queue<CrackHash::Models::ManagerRequest> tasks;
 
     std::atomic<int> healthyWorkers;
-    std::vector<std::string> workerUrls;
+    std::vector<std::string> kWorkerUrls;
     const std::string kAlphabet;
     const int kTimeoutSeconds;
     const int kManagerPort;
