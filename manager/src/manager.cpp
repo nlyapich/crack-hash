@@ -23,7 +23,7 @@ Manager::Manager(const std::vector<std::string>& workerUrls,
                  int managerPort,
                  const std::string& alphabet,
                  int timeoutSeconds)
-: healthyWorkers{static_cast<int>(workerUrls.size())},
+: healthyWorkers_{static_cast<int>(workerUrls.size())},
   kWorkerUrls{workerUrls},
   kManagerPort{managerPort},
   kAlphabet{alphabet},
@@ -110,14 +110,14 @@ void Manager::startHealthCheck()
             for (const auto& url : kWorkerUrls)
             {
                 bool healthy = checkWorkerHealth(url);
-                healthCheck.insert(url, healthy);
+                healthCheck_.insert(url, healthy);
                 if (healthy)
                 {
                     tmpHealthyWorkers++;
                 }
                 spdlog::info("Worker {} health: {}", url, healthy ? "OK" : "FAILED");
             }
-            healthyWorkers = tmpHealthyWorkers;
+            healthyWorkers_ = tmpHealthyWorkers;
         }
     }).detach();
 }
@@ -130,24 +130,24 @@ void Manager::startQueue()
         {
             std::this_thread::sleep_for(std::chrono::seconds(1));
             
-            if (!tasks.empty())
+            if (!tasks_.empty())
             {
                 for (const auto& url : kWorkerUrls)
                 {
-                    bool healthy = *healthCheck.get(url);
+                    bool healthy = *healthCheck_.get(url);
                     if (!healthy)
                     {
                         continue;
                     }
 
-                    if (*busyWorkers.get(url))
+                    if (*busyWorkers_.get(url))
                     {
                         continue;
                     }
 
-                    healthCheck.insert(url, healthy);
-                    sendTaskToWorker(url, tasks.front());
-                    tasks.pop();
+                    healthCheck_.insert(url, healthy);
+                    sendTaskToWorker(url, tasks_.front());
+                    tasks_.pop();
                 }
             }
         }
@@ -217,7 +217,7 @@ void Manager::handleCrackRequest(const httplib::Request& req, httplib::Response&
             return;
         }
         
-        auto cacheRequestId = cacheRequests.get({crackReq.hash, crackReq.maxLength});
+        auto cacheRequestId = cacheRequests_.get({crackReq.hash, crackReq.maxLength});
         if (cacheRequestId)
         {
             Models::CrackResponse crackResp;
@@ -230,22 +230,22 @@ void Manager::handleCrackRequest(const httplib::Request& req, httplib::Response&
         std::string requestId = generateUUID();
         auto state = std::make_shared<RequestState>();
         state->createdAt = std::chrono::steady_clock::now();
-        state->totalWorkers = healthyWorkers;
+        state->totalWorkers = healthyWorkers_;
         
-        cacheRequests.insert({crackReq.hash, crackReq.maxLength}, requestId);
-        requestStates.insert(requestId, state);
+        cacheRequests_.insert({crackReq.hash, crackReq.maxLength}, requestId);
+        requestStates_.insert(requestId, state);
         
         // Распределение задач между воркерами
         long long totalCount = Combinatorics::getTotalCount(kAlphabet, crackReq.maxLength);
         long long chunkSize = totalCount / state->totalWorkers;
         
-        for (size_t i = 0; i < healthyWorkers; ++i)
+        for (size_t i = 0; i < healthyWorkers_; ++i)
         {
             Models::ManagerRequest task;
             task.requestId = requestId;
             task.hash = crackReq.hash;
             task.partNumber = static_cast<int>(i);
-            task.partCount = healthyWorkers;
+            task.partCount = healthyWorkers_;
             task.maxLength = crackReq.maxLength;
     
             // Генерация алфавита из строки
@@ -254,7 +254,7 @@ void Manager::handleCrackRequest(const httplib::Request& req, httplib::Response&
                 task.alphabetSymbols.push_back(std::string(1, c));
             }
             
-            tasks.push(task);
+            tasks_.push(task);
         }
         
         // Ответ клиенту
@@ -288,7 +288,7 @@ void Manager::handleStatusRequest(const httplib::Request& req, httplib::Response
         }
         
         std::string requestId = it->second;
-        auto stateOpt = requestStates.get(requestId);
+        auto stateOpt = requestStates_.get(requestId);
         
         if (!stateOpt)
         {
@@ -331,7 +331,7 @@ void Manager::handleWorkerResponse(const httplib::Request& req, httplib::Respons
         Models::WorkerResponse workerResp = Models::WorkerResponse::fromXml(req.body);
         spdlog::info(req.body + "\n");
         
-        auto stateOpt = requestStates.get(workerResp.requestId);
+        auto stateOpt = requestStates_.get(workerResp.requestId);
         if (!stateOpt)
         {
             res.status = 404;

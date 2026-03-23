@@ -60,14 +60,14 @@ private:
 
     void startQueue();
 
-    ThreadSafeMap<std::string, std::shared_ptr<RequestState>> requestStates;
-    ThreadSafeMap<std::pair<std::string, int>, std::string> cacheRequests;
-    ThreadSafeMap<std::string, bool> healthCheck;
-    ThreadSafeMap<std::string, bool> busyWorkers;
+    ThreadSafeMap<std::string, std::shared_ptr<RequestState>> requestStates_;
+    ThreadSafeMap<std::pair<std::string, int>, std::string> cacheRequests_;
+    ThreadSafeMap<std::string, bool> healthCheck_;
+    ThreadSafeMap<std::string, bool> busyWorkers_;
 
-    std::queue<CrackHash::Models::ManagerRequest> tasks;
+    std::queue<CrackHash::Models::ManagerRequest> tasks_;
 
-    std::atomic<int> healthyWorkers;
+    std::atomic<int> healthyWorkers_;
     std::vector<std::string> kWorkerUrls;
     const std::string kAlphabet;
     const int kTimeoutSeconds;
