@@ -4,7 +4,7 @@
 #include <thread>
 #include <httplib.h>
 
-#include "xml_models.hpp" 
+#include "models.hpp" 
 
 namespace CrackHash
 {
@@ -20,10 +20,10 @@ public:
 
 private:
     // Отправка результатов менеджеру (XML)
-    bool sendResultsToManager(const CrackHash::xml_models::WorkerResponse& response);
+    bool sendResultsToManager(const Models::WorkerResponse& response);
 
-    // Перебор хэшей в заданном диапазоне (адаптировано под xml_models::ManagerRequest)
-    void bruteForce(const CrackHash::xml_models::ManagerRequest& task);
+    // Перебор хэшей в заданном диапазоне (адаптировано под Models::ManagerRequest)
+    void bruteForce(const Models::ManagerRequest& task);
 
     // Обработка задачи от менеджера (XML)
     void handleTaskRequest(const httplib::Request& req,

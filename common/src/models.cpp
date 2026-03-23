@@ -1,4 +1,4 @@
-#include "xml_models.hpp"
+#include "models.hpp"
 
 #include <sstream>
 #include <string>
@@ -8,7 +8,7 @@
 namespace CrackHash
 {
 
-namespace xml_models
+namespace Models
 {
 
 std::string ManagerRequest::toXml() const
@@ -151,6 +151,6 @@ WorkerResponse WorkerResponse::fromXml(const std::string& xml)
     return resp;
 }
 
-} // namespace xml_models
+} // namespace Models
 
 } // namespace CrackHash

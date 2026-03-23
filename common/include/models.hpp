@@ -9,8 +9,42 @@
 namespace CrackHash
 {
 
-namespace models
+namespace Models
 {
+
+// Пространства имён из XSD
+constexpr const char* NS_REQUEST = "http://ccfit.nsu.ru/schema/crack-hash-request";
+constexpr const char* NS_RESPONSE = "http://ccfit.nsu.ru/schema/crack-hash-response";
+
+// Запрос менеджера к воркеру
+struct ManagerRequest
+{
+    std::string requestId;
+    int partNumber = 0;
+    int partCount = 1;
+    std::string hash;
+    int maxLength = 0;
+    std::vector<std::string> alphabetSymbols;
+    
+    // Сериализация в XML
+    std::string toXml() const;
+    
+    // Десериализация из XML
+    static ManagerRequest fromXml(const std::string& xml);
+};
+
+// Ответ воркера менеджеру
+struct WorkerResponse
+{
+    std::string requestId;
+    std::vector<std::string> results;
+    
+    // Сериализация в XML
+    std::string toXml() const;
+    
+    // Десериализация из XML
+    static WorkerResponse fromXml(const std::string& xml);
+};
 
 // Запрос от клиента к менеджеру
 struct CrackRequest
@@ -50,13 +84,6 @@ struct WorkerTask
     int partCount;
     int maxLength;
     std::string alphabet;
-};
-
-// Ответ воркера менеджеру
-struct WorkerResponse
-{
-    std::string requestId;
-    std::vector<std::string> results;
 };
 
 // Сериализация JSON
@@ -127,7 +154,7 @@ inline void to_json(nlohmann::json& j, const StatusResponse& resp)
     j = nlohmann::json{{"status", statusStr}, {"data", resp.data}};
 }
 
-} // namespace models
+} // namespace Models
 
 } // namespace CrackHash
 

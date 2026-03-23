@@ -13,7 +13,6 @@
 #include "hash.hpp"
 #include "combinatorics.hpp"
 #include "thread_safe_map.hpp"
-#include "xml_models.hpp"
 
 using json = nlohmann::json;
 
@@ -169,7 +168,7 @@ std::string Manager::generateUUID()
 
 // Отправка задачи воркеру (XML)
 bool Manager::sendTaskToWorker(const std::string& workerUrl,
-                               const CrackHash::xml_models::ManagerRequest& task)
+                               const Models::ManagerRequest& task)
 {
     try
     {
@@ -205,7 +204,7 @@ void Manager::handleCrackRequest(const httplib::Request& req, httplib::Response&
 {
     try
     {
-        models::CrackRequest crackReq;
+        Models::CrackRequest crackReq;
         if (!req.body.empty())
         {
             crackReq = nlohmann::json::parse(req.body);
@@ -221,7 +220,7 @@ void Manager::handleCrackRequest(const httplib::Request& req, httplib::Response&
         auto cacheRequestId = cacheRequests.get({crackReq.hash, crackReq.maxLength});
         if (cacheRequestId)
         {
-            models::CrackResponse crackResp;
+            Models::CrackResponse crackResp;
             crackResp.requestId = *cacheRequestId;
             res.set_content(json(crackResp).dump(), "application/json");
             spdlog::info("Cached crack request: {}", *cacheRequestId);
@@ -242,7 +241,7 @@ void Manager::handleCrackRequest(const httplib::Request& req, httplib::Response&
         
         for (size_t i = 0; i < healthyWorkers; ++i)
         {
-            CrackHash::xml_models::ManagerRequest task;
+            Models::ManagerRequest task;
             task.requestId = requestId;
             task.hash = crackReq.hash;
             task.partNumber = static_cast<int>(i);
@@ -260,7 +259,7 @@ void Manager::handleCrackRequest(const httplib::Request& req, httplib::Response&
         }
         
         // Ответ клиенту
-        models::CrackResponse crackResp;
+        Models::CrackResponse crackResp;
         crackResp.requestId = requestId;
         
         res.set_content(json(crackResp).dump(), "application/json");
@@ -305,12 +304,12 @@ void Manager::handleStatusRequest(const httplib::Request& req, httplib::Response
         auto now = std::chrono::steady_clock::now();
         auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - state->createdAt).count();
         
-        if (state->status == models::RequestStatus::IN_PROGRESS && elapsed > kTimeoutSeconds)
+        if (state->status == Models::RequestStatus::IN_PROGRESS && elapsed > kTimeoutSeconds)
         {
-            state->status = models::RequestStatus::ERROR;
+            state->status = Models::RequestStatus::ERROR;
         }
         
-        models::StatusResponse statusResp;
+        Models::StatusResponse statusResp;
         statusResp.status = state->status;
         statusResp.data = state->results;
         
@@ -330,7 +329,7 @@ void Manager::handleWorkerResponse(const httplib::Request& req, httplib::Respons
     try
     {
         // Десериализация XML
-        CrackHash::xml_models::WorkerResponse workerResp = CrackHash::xml_models::WorkerResponse::fromXml(req.body);
+        Models::WorkerResponse workerResp = Models::WorkerResponse::fromXml(req.body);
         spdlog::info(req.body + "\n");
         
         auto stateOpt = requestStates.get(workerResp.requestId);
@@ -350,13 +349,13 @@ void Manager::handleWorkerResponse(const httplib::Request& req, httplib::Respons
                                  workerResp.results.begin(), 
                                  workerResp.results.end());
             state->workersCompleted++;
-            if (state->status == models::RequestStatus::IN_PROGRESS && !workerResp.results.empty())
+            if (state->status == Models::RequestStatus::IN_PROGRESS && !workerResp.results.empty())
             {
-                state->status = models::RequestStatus::PARTIALLY_READY;
+                state->status = Models::RequestStatus::PARTIALLY_READY;
             }
             
             if (state->workersCompleted >= state->totalWorkers) {
-                state->status = CrackHash::models::RequestStatus::READY;
+                state->status = Models::RequestStatus::READY;
             }
         }
         

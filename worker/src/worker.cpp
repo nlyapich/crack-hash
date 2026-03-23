@@ -7,7 +7,6 @@
 #include "models.hpp"
 #include "hash.hpp"
 #include "combinatorics.hpp"
-#include "xml_models.hpp" 
 
 namespace CrackHash
 {
@@ -54,7 +53,7 @@ void Worker::start()
 }
 
 // Отправка результатов менеджеру (XML)
-bool Worker::sendResultsToManager(const CrackHash::xml_models::WorkerResponse& response)
+bool Worker::sendResultsToManager(const Models::WorkerResponse& response)
 {
     try
     {
@@ -85,8 +84,8 @@ bool Worker::sendResultsToManager(const CrackHash::xml_models::WorkerResponse& r
     }
 }
 
-// Перебор хэшей в заданном диапазоне (адаптировано под xml_models::ManagerRequest)
-void Worker::bruteForce(const CrackHash::xml_models::ManagerRequest& task)
+// Перебор хэшей в заданном диапазоне (адаптировано под Models::ManagerRequest)
+void Worker::bruteForce(const Models::ManagerRequest& task)
 {
     std::vector<std::string> results;
     
@@ -100,7 +99,7 @@ void Worker::bruteForce(const CrackHash::xml_models::ManagerRequest& task)
         }
     }
     
-    long long totalCount = CrackHash::Combinatorics::getTotalCount(alphabet, task.maxLength);
+    long long totalCount = Combinatorics::getTotalCount(alphabet, task.maxLength);
     long long chunkSize = totalCount / task.partCount;
     
     long long startIndex = task.partNumber * chunkSize;
@@ -113,8 +112,8 @@ void Worker::bruteForce(const CrackHash::xml_models::ManagerRequest& task)
     
     for (long long i = startIndex; i < endIndex; ++i)
     {
-        std::string word = CrackHash::Combinatorics::getByIndex(alphabet, task.maxLength, i);
-        std::string hash = CrackHash::Hash::md5(word);
+        std::string word = Combinatorics::getByIndex(alphabet, task.maxLength, i);
+        std::string hash = Hash::md5(word);
         
         if (hash == task.hash)
         {
@@ -129,7 +128,7 @@ void Worker::bruteForce(const CrackHash::xml_models::ManagerRequest& task)
     }
     
     // Отправка результатов менеджеру (XML)
-    CrackHash::xml_models::WorkerResponse response;
+    Models::WorkerResponse response;
     response.requestId = task.requestId;
     response.results = results;
     
@@ -142,7 +141,7 @@ void Worker::handleTaskRequest(const httplib::Request& req, httplib::Response& r
     try
     {
         // Десериализация XML в модель
-        CrackHash::xml_models::ManagerRequest task = CrackHash::xml_models::ManagerRequest::fromXml(req.body);
+        Models::ManagerRequest task = Models::ManagerRequest::fromXml(req.body);
         
         spdlog::info("Received task for request: {}\n", task.requestId);
         
@@ -167,4 +166,4 @@ void Worker::handleTaskRequest(const httplib::Request& req, httplib::Response& r
     }
 }
 
-}
+} // namespace CrackHash

@@ -11,7 +11,6 @@
 
 #include "models.hpp"
 #include "thread_safe_map.hpp"
-#include "xml_models.hpp"
 
 namespace CrackHash
 {
@@ -19,7 +18,7 @@ namespace CrackHash
 // Структура состояния запроса
 struct RequestState
 {
-    models::RequestStatus status = models::RequestStatus::IN_PROGRESS;
+    Models::RequestStatus status = Models::RequestStatus::IN_PROGRESS;
     std::vector<std::string> results;
     int workersCompleted = 0;
     int totalWorkers = 0;
@@ -44,7 +43,7 @@ private:
 
     // Отправка задачи воркеру (XML вместо JSON)
     bool sendTaskToWorker(const std::string& workerUrl,
-                          const CrackHash::xml_models::ManagerRequest& task);
+                          const CrackHash::Models::ManagerRequest& task);
 
     // Обработка запроса на взлом хэша
     void handleCrackRequest(const httplib::Request& req, httplib::Response& res);
@@ -66,7 +65,7 @@ private:
     ThreadSafeMap<std::string, bool> healthCheck;
     ThreadSafeMap<std::string, bool> busyWorkers;
 
-    std::queue<CrackHash::xml_models::ManagerRequest> tasks;
+    std::queue<CrackHash::Models::ManagerRequest> tasks;
 
     std::atomic<int> healthyWorkers;
     std::vector<std::string> workerUrls;
